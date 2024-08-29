@@ -1,4 +1,4 @@
 package com.rulezero.playerconnector.dao;
 
-public class StoresDao {
+public interface StoresDao {
 }
