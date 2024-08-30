@@ -3,10 +3,12 @@ package com.rulezero.playerconnector.handler;
 import com.rulezero.playerconnector.controller.model.GamesData;
 import com.rulezero.playerconnector.service.GamesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Scanner;
 
+@Component
 public class GameMenuHandler {
 
     @Autowired
@@ -31,7 +33,7 @@ public class GameMenuHandler {
                 case 1 -> addGame();
                 case 2 -> listGames();
                 case 3 -> selectGame();
-                case 4 -> updateGame();
+                case 4 -> patchGame();
                 case 5 -> deleteGame();
                 case 0 -> back = true;
                 default -> System.out.println("Invalid selection");
@@ -76,29 +78,41 @@ public class GameMenuHandler {
         games.forEach(game -> System.out.println(game.toString()));
     }
 
-    private void updateGame() {
+    private void patchGame() {
         System.out.println("Enter game ID to update:");
         Long gameId = Long.parseLong(scanner.nextLine());
 
-        System.out.println("Enter new game name:");
-        String name = scanner.nextLine();
-
-        System.out.println("Enter new game genre:");
-        String genre = scanner.nextLine();
-
-        System.out.println("Enter new release date (YYYY-MM-DD):");
-        String releaseDate = scanner.nextLine();
-
-        // Fetch the existing game, update it, and save it
+        // Fetch the existing game
         GamesData existingGame = gamesService.getGameById(gameId);
-        existingGame.setGameName(name);
-        existingGame.setGameDescription(gameDescription);
-        existingGame.setMinPlayers(minPlayers);
-        existingGame.setMaxPlayers(maxPlayers);
-        existingGame.setGameUsers(null);
-        existingGame.setStores(null);
 
-        GamesData updatedGame = gamesService.updateGame(existingGame);
+        System.out.println("Enter new game name (leave blank to keep current):");
+        String gameName = scanner.nextLine();
+        if (!gameName.isEmpty()) {
+            existingGame.setGameName(gameName);
+        }
+
+        System.out.println("Enter new game description (leave blank to keep current):");
+        String gameDescription = scanner.nextLine();
+        if (!gameDescription.isEmpty()) {
+            existingGame.setGameDescription(gameDescription);
+        }
+
+        System.out.println("Enter new minimum number of players (leave blank to keep current):");
+        String minPlayersInput = scanner.nextLine();
+        if (!minPlayersInput.isEmpty()) {
+            existingGame.setMinPlayers(Integer.parseInt(minPlayersInput));
+        }
+
+        System.out.println("Enter new maximum number of players (leave blank to keep current):");
+        String maxPlayersInput = scanner.nextLine();
+        if (!maxPlayersInput.isEmpty()) {
+            existingGame.setMaxPlayers(Integer.parseInt(maxPlayersInput));
+        }
+
+        // You may want to handle gameUsers and stores similarly, allowing updates only if provided.
+        // e.g., if(gameUsersInputIsNotEmpty) { existingGame.setGameUsers(...) }
+
+        GamesData updatedGame = gamesService.patchGame(existingGame);
         System.out.println("Game updated: " + updatedGame);
     }
 
