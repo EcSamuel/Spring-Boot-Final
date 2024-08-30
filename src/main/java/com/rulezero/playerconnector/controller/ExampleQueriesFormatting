@@ -21,3 +21,32 @@ Content-Type: application/json
 DELETE http://localhost:8080/games/2
 
 GET http://localhost:8080/games/1
+
+*** AVAILABILITY ***
+POST http://localhost:8080/availabilities
+Content-Type: application/json
+
+{
+  "dayOfWeek": "Saturday",
+  "startTime": "2:30 PM",
+  "endTime": "11:00 PM",
+  "userId": 1
+}
+
+*** USERS***
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "firstName": "Gary",
+  "lastName": "Gygax",
+  "userPhone": "830-555-9292",
+  "userAddress": "1818 SW Third St",
+  "userCity": "Delmont",
+  "userRegion": "Michigan",
+  "userLoginName": "TheOriginalDM",
+  "userPassword": "MindFlay3r",
+  "availabilityId": 1,
+  "gameIds": [],
+  "storeIds": []
+}
