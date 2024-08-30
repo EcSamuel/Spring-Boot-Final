@@ -1,0 +1,23 @@
+PATCH http://localhost:8080/games/1
+Content-Type: application/json
+
+{
+  "gameName": "Magic TCG",
+  "gameDescription": "Game Desc Here",
+  "minPlayers": 2,
+  "maxPlayers": 10
+}
+
+POST http://localhost:8080/games
+Content-Type: application/json
+
+{
+  "gameName": "Dungeons and Dragons",
+  "gameDescription": "Game Desc Here",
+  "minPlayers": 2,
+  "maxPlayers": 10
+}
+
+DELETE http://localhost:8080/games/2
+
+GET http://localhost:8080/games/1

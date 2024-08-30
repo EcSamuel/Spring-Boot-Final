@@ -38,6 +38,16 @@ public class GamesController {
         }
     }
 
+    @GetMapping("/{gameId}")
+    public ResponseEntity<GamesData> getGameById(@PathVariable Long gameId) {
+        try {
+            GamesData gameData = gamesService.getGameById(gameId);
+            return ResponseEntity.ok(gameData);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
     @GetMapping("/search")
     public List<GamesData> searchGames(@RequestParam String query) {
         log.info("Requesting Game Search: {}", query);

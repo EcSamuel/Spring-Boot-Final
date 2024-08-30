@@ -123,4 +123,11 @@ public class GamesService {
         gamesData.setStores(game.getStores());
         return gamesData;
     }
+
+    public GamesData getGameById(Long gameId) {
+        Games game = gamesDao.findById(gameId)
+                .orElseThrow(() -> new ResourceNotFoundException("Game not found with id: " + gameId));
+
+        return convertToGamesData(game);
+    }
 }
