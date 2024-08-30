@@ -89,7 +89,7 @@ public class GamesService {
 
         // Remove the game from all players and stores
         game.getPlayers().forEach(player -> player.getUserGames().remove(game));
-        game.getStores().forEach(store -> store.getGames().remove(game));
+        game.getStores().forEach(store -> store.getStoreGames().remove(game));
 
         gamesDao.delete(game);
     }
@@ -154,7 +154,7 @@ public class GamesService {
         List<Games> games = gamesDao.findAllById(gameIds);
         games.forEach(game -> {
             game.getPlayers().forEach(player -> player.getUserGames().remove(game));
-            game.getStores().forEach(store -> store.getGames().remove(game));
+            game.getStores().forEach(store -> store.getStoreGames().remove(game));
             gamesDao.delete(game);
         });
     }

@@ -2,6 +2,7 @@ package com.rulezero.playerconnector.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +11,7 @@ import java.util.Set;
 @Data
 public class Users {
     @Id
+    @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId; // Maps to user_id in your SQL
 
@@ -47,7 +49,7 @@ public class Users {
     @ManyToMany(mappedBy = "players")
     private Set<Games> userGames = new HashSet<>();
 
-    public Long getUserId() {
-        return userId;
-    }
+    @ManyToMany(mappedBy = "stores")
+    private Set<Stores> userStores = new HashSet<>();
+
 }
