@@ -24,7 +24,7 @@ public class Games {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "game_players",
+            name = "user_games",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
@@ -32,7 +32,7 @@ public class Games {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "game_stores",
+            name = "store_games",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "store_id")
     )
