@@ -3,6 +3,7 @@ package com.rulezero.playerconnector.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -21,12 +22,34 @@ public class Games {
 
     private String description;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "game_players",
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<Users> players;
+    private Set<Users> players = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "game_stores",
+            joinColumns = @JoinColumn(name = "game_id"),
+            inverseJoinColumns = @JoinColumn(name = "store_id")
+    )
+    private Set<Stores> stores = new HashSet<>();
+
+    // Helper methods for managing players
+    public void addPlayer(Users user) {
+        this.players.add(user);
+        user.getUserGames().add(this);
+    }
+
+    public void removePlayer(Users user) {
+        this.players.remove(user);
+        user.getUserGames().remove(this);
+    }
+
+    public void addStore(Stores stores) {
+    }
 }
 

@@ -3,11 +3,15 @@ package com.rulezero.playerconnector.service;
 import com.rulezero.playerconnector.controller.model.GamesData;
 import com.rulezero.playerconnector.dao.GamesDao;
 import com.rulezero.playerconnector.entity.Games;
+import com.rulezero.playerconnector.entity.Users;
+import com.rulezero.playerconnector.entity.Stores;
 import com.rulezero.playerconnector.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,42 +20,78 @@ public class GamesService {
     @Autowired
     private GamesDao gamesDao;
 
-    // Save Game method
+    @Transactional
     public GamesData saveGame(GamesData gamesData) {
-        // Convert GamesData to Games entity
         Games game = convertToEntity(gamesData);
-
-        // Save the game entity
         Games savedGame = gamesDao.save(game);
-
-        // Convert back to GamesData
         return convertToGamesData(savedGame);
     }
 
-    // Patch Game method
+    @Transactional
     public GamesData patchGame(Long gameId, GamesData gamesData) throws ResourceNotFoundException {
         Games existingGame = gamesDao.findById(gameId)
                 .orElseThrow(() -> new ResourceNotFoundException("Game not found with id: " + gameId));
 
-        // Update fields that are not null in gamesData
+        updateGameFields(existingGame, gamesData);
+
+        Games updatedGame = gamesDao.save(existingGame);
+        return convertToGamesData(updatedGame);
+    }
+
+    private void updateGameFields(Games game, GamesData gamesData) {
         if (gamesData.getGameName() != null) {
-            existingGame.setName(gamesData.getGameName());
+            game.setName(gamesData.getGameName());
         }
         if (gamesData.getMinPlayers() != null) {
-            existingGame.setMinPlayers(gamesData.getMinPlayers());
+            game.setMinPlayers(gamesData.getMinPlayers());
         }
         if (gamesData.getMaxPlayers() != null) {
-            existingGame.setMaxPlayers(gamesData.getMaxPlayers());
+            game.setMaxPlayers(gamesData.getMaxPlayers());
         }
         if (gamesData.getGameDescription() != null) {
-            existingGame.setDescription(gamesData.getGameDescription());
+            game.setDescription(gamesData.getGameDescription());
         }
-        // Handle players update if necessary
+        if (gamesData.getGameUsers() != null) {
+            updatePlayers(game, gamesData.getGameUsers());
+        }
+        if (gamesData.getStores() != null) {
+            updateStores(game, gamesData.getStores());
+        }
+    }
 
-        // Save updated game
-        Games updatedGame = gamesDao.save(existingGame);
+    private void updatePlayers(Games game, Set<Users> newPlayers) {
+        // Remove players not in the new set
+        game.getPlayers().removeIf(player -> !newPlayers.contains(player));
 
-        return convertToGamesData(updatedGame);
+        // Add new players
+        newPlayers.forEach(game::addPlayer);
+    }
+
+    private void updateStores(Games game, Set<Stores> newStores) {
+        // Remove stores not in the new set
+        game.getStores().removeIf(store -> !newStores.contains(store));
+
+        // Add new stores
+        newStores.forEach(game::addStore);
+    }
+
+    public List<GamesData> searchGamesByName(String query) {
+        List<Games> games = gamesDao.findByNameContainingIgnoreCase(query);
+        return games.stream()
+                .map(this::convertToGamesData)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteGame(Long gameId) throws ResourceNotFoundException {
+        Games game = gamesDao.findById(gameId)
+                .orElseThrow(() -> new ResourceNotFoundException("Game not found with id: " + gameId));
+
+        // Remove the game from all players and stores
+        game.getPlayers().forEach(player -> player.getUserGames().remove(game));
+        game.getStores().forEach(store -> store.getGames().remove(game));
+
+        gamesDao.delete(game);
     }
 
     private Games convertToEntity(GamesData gamesData) {
@@ -60,7 +100,15 @@ public class GamesService {
         game.setMinPlayers(gamesData.getMinPlayers());
         game.setMaxPlayers(gamesData.getMaxPlayers());
         game.setDescription(gamesData.getGameDescription());
-        // Handle conversion of players if needed
+
+        if (gamesData.getGameUsers() != null) {
+            gamesData.getGameUsers().forEach(game::addPlayer);
+        }
+
+        if (gamesData.getStores() != null) {
+            gamesData.getStores().forEach(game::addStore);
+        }
+
         return game;
     }
 
@@ -71,19 +119,8 @@ public class GamesService {
         gamesData.setMinPlayers(game.getMinPlayers());
         gamesData.setMaxPlayers(game.getMaxPlayers());
         gamesData.setGameDescription(game.getDescription());
-        // Convert players if needed
+        gamesData.setGameUsers(game.getPlayers());
+        gamesData.setStores(game.getStores());
         return gamesData;
-    }
-
-    public List<GamesData> searchGamesByName(String query) {
-        List<Games> games = gamesDao.findGameNameContaining(query);
-        return games.stream()
-                .map(this::convertToGamesData)
-                .collect(Collectors.toList());
-
-    }
-
-    public void deleteGame(Long gameId) {
-        gamesDao.deleteById(gameId);
     }
 }
