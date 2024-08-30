@@ -60,6 +60,7 @@ public class GamesController {
     }
 
     @DeleteMapping("/{gameId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deleteGame(@PathVariable Long gameId) {
         log.info("Requesting Game Deletion: {}", gameId);
         try {

@@ -130,4 +130,40 @@ public class GamesService {
 
         return convertToGamesData(game);
     }
+
+    @Transactional
+    public GamesData updateGamePlayers(Long gameId, Set<Users> newPlayers) throws ResourceNotFoundException {
+        Games game = gamesDao.findById(gameId)
+                .orElseThrow(() -> new ResourceNotFoundException("Game not found with id: " + gameId));
+        updatePlayers(game, newPlayers);
+        Games updatedGame = gamesDao.save(game);
+        return convertToGamesData(updatedGame);
+    }
+
+    @Transactional
+    public GamesData updateGameStores(Long gameId, Set<Stores> newStores) throws ResourceNotFoundException {
+        Games game = gamesDao.findById(gameId)
+                .orElseThrow(() -> new ResourceNotFoundException("Game not found with id: " + gameId));
+        updateStores(game, newStores);
+        Games updatedGame = gamesDao.save(game);
+        return convertToGamesData(updatedGame);
+    }
+
+    @Transactional
+    public void deleteGames(List<Long> gameIds) {
+        List<Games> games = gamesDao.findAllById(gameIds);
+        games.forEach(game -> {
+            game.getPlayers().forEach(player -> player.getUserGames().remove(game));
+            game.getStores().forEach(store -> store.getGames().remove(game));
+            gamesDao.delete(game);
+        });
+    }
+
+    public List<GamesData> getAllGames() {
+        List<Games> games = gamesDao.findAll();
+        return games.stream()
+                .map(this::convertToGamesData)
+                .collect(Collectors.toList());
+    }
+
 }

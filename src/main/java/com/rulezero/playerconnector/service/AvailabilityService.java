@@ -8,6 +8,7 @@ import com.rulezero.playerconnector.exception.ResourceNotFoundException;
 import com.rulezero.playerconnector.dao.AvailabilityDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class AvailabilityService {
     @Autowired
     private UsersDao usersDao;
 
+    @Transactional
     public AvailabilityData saveAvailability(AvailabilityData availabilityData) {
         Users user = usersDao.findById(availabilityData.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -36,7 +38,6 @@ public class AvailabilityService {
         return mapToData(savedAvailability);
     }
 
-
     public List<AvailabilityData> getAvailabilityByUserId(Long userId) {
         List<Availability> availabilities = availabilityDao.findByUser_UserId(userId);
         return availabilities.stream().map(this::mapToData).collect(Collectors.toList());
@@ -51,4 +52,45 @@ public class AvailabilityService {
         data.setUserId(availability.getUser().getUserId());
         return data;
     }
+
+    public List<AvailabilityData> getAllAvailability() {
+        List<Availability> availabilities = availabilityDao.findAll();
+        return availabilities.stream()
+                .map(this::mapToData)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public AvailabilityData updateAvailability(Long availabilityId, AvailabilityData availabilityData) throws ResourceNotFoundException {
+        Availability existingAvailability = availabilityDao.findById(availabilityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + availabilityId));
+
+        existingAvailability.setDayOfWeek(availabilityData.getDayOfWeek());
+        existingAvailability.setStartTime(availabilityData.getStartTime());
+        existingAvailability.setEndTime(availabilityData.getEndTime());
+
+        Availability updatedAvailability = availabilityDao.save(existingAvailability);
+        return mapToData(updatedAvailability);
+    }
+
+    @Transactional
+    public void deleteAvailabilityByUserId(Long userId) {
+        List<Availability> availabilities = availabilityDao.findByUser_UserId(userId);
+        availabilityDao.deleteAll(availabilities);
+    }
+
+    public void deleteAvailabilityByAvailabilityId(Long availabilityId) {
+        Availability availability = availabilityDao.findById(availabilityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + availabilityId));
+        availabilityDao.delete(availability);
+    }
+    // unsure if I'll ever need this one
+//    public List<AvailabilityData> getAvailabilityByDateRange(LocalDate startDate, LocalDate endDate) {
+//        List<Availability> availabilities = availabilityDao.findByDateRange(startDate, endDate);
+//        return availabilities.stream()
+//                .map(this::mapToData)
+//                .collect(Collectors.toList());
+//    }
+
+
 }

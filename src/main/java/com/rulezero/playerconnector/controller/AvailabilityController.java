@@ -30,4 +30,31 @@ public class AvailabilityController {
         List<AvailabilityData> availabilities = availabilityService.getAvailabilityByUserId(userId);
         return ResponseEntity.ok(availabilities);
     }
+
+    @GetMapping
+    public ResponseEntity<List<AvailabilityData>> getAvailabilities() {
+        List<AvailabilityData> availabilities = availabilityService.getAllAvailability();
+        return ResponseEntity.ok(availabilities);
+    }
+
+    @PutMapping("/{availabilityId}")
+    public ResponseEntity<AvailabilityData> updateAvailability(
+            @PathVariable Long availabilityId,
+            @RequestBody AvailabilityData availabilityData) {
+        AvailabilityData updatedAvailability = availabilityService.updateAvailability(availabilityId, availabilityData);
+        return ResponseEntity.ok(updatedAvailability);
+    }
+
+    @DeleteMapping("/user/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAvailabilityByUserId(@PathVariable Long userId) {
+        availabilityService.deleteAvailabilityByUserId(userId);
+    }
+
+    @DeleteMapping("/{availabilityId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAvailabiltyByAvailabilityId(@PathVariable Long availabilityId) {
+        availabilityService.deleteAvailabilityByAvailabilityId(availabilityId);
+    }
+
 }
