@@ -14,7 +14,7 @@ public class StoresData {
     private String storeEmail;
     private Boolean storeDisabilityCheck;
     private Boolean outsideFood;
-    private Long hoursId;
+//    private Long hoursId;
     private String storeRegion;
     private Integer storeParking;
     //    private StoreHoursData storeHours;

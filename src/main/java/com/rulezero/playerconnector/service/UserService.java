@@ -138,6 +138,11 @@ public class UserService {
         usersDao.save(user);
     }
 
+    public Users getUserEntityById(Long userId) {
+        return usersDao.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+    }
+
     @Transactional
     public void updateUserGames(Users user, Set<Long> gameIds) {
         Set<Games> newGames = gameIds.stream()

@@ -35,7 +35,7 @@ public class Stores {
     @Column(nullable = false)
     private Boolean outsideFood;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "store_games",
             joinColumns = @JoinColumn(name = "store_id"),
@@ -43,7 +43,7 @@ public class Stores {
     )
     private Set<Games> storeGames = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "store_users",
             joinColumns = @JoinColumn(name = "store_id"),

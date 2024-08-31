@@ -5,8 +5,10 @@ import com.rulezero.playerconnector.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -136,7 +138,75 @@ public class UserMenuHandler {
             existingUser.setLastName(lastName);
         }
 
-        // TODO: (add similar update logic for other fields)
+        System.out.println("Enter new phone number (leave blank to keep current):");
+        String userPhone = scanner.nextLine();
+        if (!userPhone.isEmpty()) {
+            existingUser.setUserPhone(userPhone);
+        }
+
+        System.out.println("Enter new address for user (leave blank to keep current):");
+        String userAddress = scanner.nextLine();
+        if (!userAddress.isEmpty()) {
+            existingUser.setUserAddress(userAddress);
+        }
+
+        System.out.println("Enter new city for user (leave blank to keep current):");
+        String userCity = scanner.nextLine();
+        if (!userCity.isEmpty()) {
+            existingUser.setUserCity(userCity);
+        }
+
+        System.out.println("Enter new region for user (leave blank to keep current):");
+        String userRegion = scanner.nextLine();
+        if (!userRegion.isEmpty()) {
+            existingUser.setUserRegion(userRegion);
+        }
+
+        System.out.println("Enter new login name for user (leave blank to keep current):");
+        String userLoginName = scanner.nextLine();
+        if (!userLoginName.isEmpty()) {
+            existingUser.setUserLoginName(userLoginName);
+        }
+
+        System.out.println("Enter new password for user (leave blank to keep current):");
+        String password = scanner.nextLine();
+        if (!password.isEmpty()) {
+            existingUser.setPassword(password);
+        }
+
+        System.out.println("Enter new email for user (leave blank to keep current):");
+        String userEmail = scanner.nextLine();
+        if (!userEmail.isEmpty()) {
+            existingUser.setUserEmail(userEmail);
+        }
+
+        System.out.println("Update the user's stores? (leave blank to keep current):");
+        String storeIdsInput = scanner.nextLine();
+        if (!storeIdsInput.isEmpty()) {
+            Set<Long> currentStoreIds = existingUser.getStoreIds();
+            if (currentStoreIds == null) {
+                currentStoreIds = new HashSet<>();
+            }
+            String[] newStoreIds = storeIdsInput.trim().split(",");
+            for (String storeId : newStoreIds) {
+                currentStoreIds.add(Long.parseLong(storeId));
+            }
+            existingUser.setStoreIds(currentStoreIds);
+        }
+
+        System.out.println("Update the user's games? (leave blank to keep current):");
+        String gameIdsInput = scanner.nextLine();
+        if (!gameIdsInput.isEmpty()) {
+            Set<Long> currentGameIds = existingUser.getGameIds();
+            if (currentGameIds == null) {
+                currentGameIds = new HashSet<>();
+            }
+            String[] newGameIds = gameIdsInput.trim().split(",");
+            for (String gameId : newGameIds) {
+                currentGameIds.add(Long.parseLong(gameId));
+            }
+            existingUser.setGameIds(currentGameIds);
+        }
 
         UsersData updatedUser = usersService.patchUser(existingUser.getUserId(), existingUser);
         System.out.println("User updated: " + updatedUser);

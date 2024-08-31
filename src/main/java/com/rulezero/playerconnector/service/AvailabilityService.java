@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,20 +24,27 @@ public class AvailabilityService {
     private UsersDao usersDao;
 
     @Transactional
-    public AvailabilityData saveAvailability(AvailabilityData availabilityData) {
-        Users user = usersDao.findById(availabilityData.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public Availability saveAvailability(Availability availability, Users users) {
+        if (users == null || availability == null) {
+            throw new IllegalArgumentException("User and Availability must not be null");
+        }
 
-        Availability availability = new Availability();
-        availability.setDayOfWeek(availabilityData.getDayOfWeek());
-        availability.setStartTime(availabilityData.getStartTime());
-        availability.setEndTime(availabilityData.getEndTime());
-        availability.setUser(user);
+        if (availability.getAvailabilityId() != null) {
+            Optional<Availability> existingAvailability = availabilityDao.findById(availability.getAvailabilityId());
 
-        Availability savedAvailability = availabilityDao.save(availability);
-
-        return mapToData(savedAvailability);
+            if (existingAvailability.isPresent()) {
+                Availability availToUpdate = existingAvailability.get();
+                availToUpdate.setStartTime(availability.getStartTime());
+                availToUpdate.setEndTime(availability.getEndTime());
+                availToUpdate.setDayOfWeek(availability.getDayOfWeek());
+                return availabilityDao.save(availToUpdate);
+            }
+        }
+        // If the availability ID is null or it doesn't exist in the database
+        availability.setUser(users);
+        return availabilityDao.save(availability);
     }
+
 
     public AvailabilityData getAvailabilityById(Long availabilityId) {
         Availability availability = availabilityDao.findById(availabilityId)
@@ -56,7 +64,7 @@ public class AvailabilityService {
         return availabilities.stream().map(this::mapToData).collect(Collectors.toList());
     }
 
-    private AvailabilityData mapToData(Availability availability) {
+    public AvailabilityData mapToData(Availability availability) {
         AvailabilityData data = new AvailabilityData();
         data.setAvailabilityId(availability.getAvailabilityId());
         data.setDayOfWeek(availability.getDayOfWeek());
@@ -99,7 +107,17 @@ public class AvailabilityService {
         availabilityDao.delete(availability);
     }
 
-    public void deleteAvailability(Long availabilityId) {
+    public Availability convertToEntity(AvailabilityData availabilityData) {
+        Availability availability = new Availability();
+        availability.setAvailabilityId(availabilityData.getAvailabilityId());
+        availability.setDayOfWeek(availabilityData.getDayOfWeek());
+        availability.setStartTime(availabilityData.getStartTime());
+        availability.setEndTime(availabilityData.getEndTime());
+        if (availabilityData.getUserId() != null) {
+            Users user = usersDao.findById(availabilityData.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + availabilityData.getUserId()));
+        }
+        return availability;
     }
 
     // unsure if I'll ever need this one

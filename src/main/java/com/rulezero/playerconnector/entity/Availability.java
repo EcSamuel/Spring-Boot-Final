@@ -1,12 +1,12 @@
 package com.rulezero.playerconnector.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Availability {
 
     @Id
@@ -22,7 +22,7 @@ public class Availability {
     @Column(nullable = false, length = 64)
     private String endTime;
 
-    @ManyToOne
+    @ManyToOne(optional = true)
     @JoinColumn(name = "user_id")
     private Users user;
 

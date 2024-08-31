@@ -5,8 +5,8 @@ import com.rulezero.playerconnector.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -129,7 +129,77 @@ public class StoreMenuHandler {
             existingStore.setStoreName(storeName);
         }
 
-        // TODO: (add similar update logic for other fields)
+        System.out.println("Enter new store address (leave blank to keep current):");
+        String storeAddress = scanner.nextLine();
+        if (!storeAddress.isEmpty()) {
+            existingStore.setStoreAddress(storeAddress);
+        }
+
+        System.out.println("Enter new store city (leave blank to keep current):");
+        String storeCity = scanner.nextLine();
+        if (!storeCity.isEmpty()) {
+            existingStore.setStoreCity(storeCity);
+        }
+
+        System.out.println("Enter new store phone (leave blank to keep current):");
+        String storePhone = scanner.nextLine();
+        if (!storePhone.isEmpty()) {
+            existingStore.setStorePhone(storePhone);
+        }
+
+        System.out.println("Enter new store email (leave blank to keep current):");
+        String storeEmail = scanner.nextLine();
+        if (!storeEmail.isEmpty()) {
+            existingStore.setStoreEmail(storeEmail);
+        }
+
+        System.out.println("Enter new store state/region (leave blank to keep current):");
+        String storeRegion = scanner.nextLine();
+        if (!storeRegion.isEmpty()) {
+            existingStore.setStoreRegion(storeRegion);
+        }
+        // unsure about how to update booleans this way
+        System.out.println("Update store disability access? (true/false, leave blank to keep current):");
+        String disabilityInput = scanner.nextLine();
+        if (!disabilityInput.isEmpty()) {
+            Boolean storeDisabilityCheck = Boolean.parseBoolean(disabilityInput);
+            existingStore.setStoreDisabilityCheck(storeDisabilityCheck);
+        }
+
+        System.out.println("Update outside food access? (true/false, leave blank to keep current):");
+        String foodInput = scanner.nextLine();
+        if (!foodInput.isEmpty()) {
+            Boolean outsideFood = Boolean.parseBoolean(foodInput);
+            existingStore.setOutsideFood(outsideFood);
+        }
+        // unsure about this because once again it feels like its updating Sets of id's instead of whole entities. Also how do I ensure it adds instead of overwrites? I have calls inside one of the Store layers for this...
+        System.out.println("Update Games offered at store? (enter game IDs separated by commas, leave blank to keep current):");
+        String gameIdsInput = scanner.nextLine();
+        if (!gameIdsInput.isEmpty()) {
+            Set<Long> currentGameIds = existingStore.getStoreGameIds(); // Get current set
+            if (currentGameIds == null) {
+                currentGameIds = new HashSet<>(); // Initialize if null
+            }
+            String[] newGameIds = gameIdsInput.split(",");
+            for (String gameId : newGameIds) {
+                currentGameIds.add(Long.parseLong(gameId.trim()));
+            }
+            existingStore.setStoreGameIds(currentGameIds);
+        }
+
+        System.out.println("Update patrons of the store? (enter user IDs separated by commas, leave blank to keep current):");
+        String userIdsInput = scanner.nextLine();
+        if (!userIdsInput.isEmpty()) {
+            Set<Long> currentUserIds = existingStore.getStoreUserIds();
+            if (currentUserIds == null) {
+                currentUserIds = new HashSet<>();
+            }
+            String[] newUserIds = userIdsInput.split(",");
+            for (String userId : newUserIds) {
+                currentUserIds.add(Long.parseLong(userId.trim()));
+            }
+            existingStore.setStoreUserIds(currentUserIds);
+        }
 
         StoresData updatedStore = storesService.patchStore(existingStore.getStoreId(), existingStore);
         System.out.println("Store updated: " + updatedStore);

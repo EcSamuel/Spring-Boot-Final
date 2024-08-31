@@ -1,10 +1,12 @@
 package com.rulezero.playerconnector.handler;
 
 import com.rulezero.playerconnector.controller.model.AvailabilityData;
+import com.rulezero.playerconnector.entity.Availability;
+import com.rulezero.playerconnector.entity.Users;
 import com.rulezero.playerconnector.service.AvailabilityService;
+import com.rulezero.playerconnector.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -14,6 +16,9 @@ public class AvailabilityMenuHandler {
 
     @Autowired
     private AvailabilityService availabilityService;
+
+    @Autowired
+    private UserService userService;
 
     private Scanner scanner = new Scanner(System.in);
 
@@ -48,6 +53,9 @@ public class AvailabilityMenuHandler {
     }
 
     private void addAvailability() {
+        System.out.println("Enter user Id:");
+        Long userId = Long.parseLong(scanner.nextLine());
+
         System.out.println("Enter day of week:");
         String dayOfWeek = scanner.nextLine();
 
@@ -62,10 +70,22 @@ public class AvailabilityMenuHandler {
         newAvailability.setStartTime(startTime);
         newAvailability.setEndTime(endTime);
 
-        AvailabilityData savedAvailability = availabilityService.saveAvailability(newAvailability);
-        System.out.println("Availability added: " + savedAvailability);
-    }
+        try {
+            // Convert AvailabilityData to Availability entity
+            Availability availability = availabilityService.convertToEntity(newAvailability);
 
+            // Fetch the User entity
+            Users user = userService.getUserEntityById(userId);
+
+            // Save the availability
+            Availability savedAvailability = availabilityService.saveAvailability(availability, user);
+
+            System.out.println("Availability added: " + availabilityService.mapToData(savedAvailability));
+        } catch (Exception e) {
+            System.out.println("Error adding availability: " + e.getMessage());
+        }
+    }
+// TODO: saveAvailability might be expecting two things passed in, one having to do with Users of some form.
     private void listAvailabilities() {
         List<AvailabilityData> availabilities = availabilityService.getAllAvailabilities();
         availabilities.forEach(availability -> System.out.println(availability.getAvailabilityId() + ": " + availability.getDayOfWeek() + " " + availability.getStartTime() + " - " + availability.getEndTime()));
