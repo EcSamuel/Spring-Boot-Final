@@ -32,9 +32,15 @@ public class AvailabilityController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AvailabilityData>> getAvailabilities() {
-        List<AvailabilityData> availabilities = availabilityService.getAllAvailability();
+    public ResponseEntity<List<AvailabilityData>> getAllAvailabilities() {
+        List<AvailabilityData> availabilities = availabilityService.getAllAvailabilities();
         return ResponseEntity.ok(availabilities);
+    }
+
+    @GetMapping("/{availabilityId}")
+    public ResponseEntity<AvailabilityData> getAvailabilityById(@PathVariable Long availabilityId) {
+        AvailabilityData availability = availabilityService.getAvailabilityById(availabilityId);
+        return ResponseEntity.ok(availability);
     }
 
     @PutMapping("/{availabilityId}")
@@ -53,8 +59,7 @@ public class AvailabilityController {
 
     @DeleteMapping("/{availabilityId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAvailabiltyByAvailabilityId(@PathVariable Long availabilityId) {
-        availabilityService.deleteAvailabilityByAvailabilityId(availabilityId);
+    public void deleteAvailabilityById(@PathVariable Long availabilityId) {
+        availabilityService.deleteAvailabilityById(availabilityId);
     }
-
 }

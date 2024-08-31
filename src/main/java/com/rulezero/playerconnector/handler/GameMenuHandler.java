@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 @Component
 public class GameMenuHandler {
@@ -20,9 +21,8 @@ public class GameMenuHandler {
         List<String> gameMenu = List.of(
                 "1) Add a Game",
                 "2) List Games",
-                "3) Select a Game",
-                "4) Update a Game",
-                "5) Delete a Game",
+                "3) Select a Game to Update",
+                "4) Delete a Game",
                 "0) Back"
         );
 
@@ -32,9 +32,8 @@ public class GameMenuHandler {
             switch (selection) {
                 case 1 -> addGame();
                 case 2 -> listGames();
-                case 3 -> selectGame();
-                case 4 -> patchGame();
-                case 5 -> deleteGame();
+                case 3 -> selectAndUpdateGame();
+                case 4 -> deleteGame();
                 case 0 -> back = true;
                 default -> System.out.println("Invalid selection");
             }
@@ -44,7 +43,7 @@ public class GameMenuHandler {
     private int getUserSelection(List<String> menu) {
         System.out.println("\nMake a selection:");
         menu.forEach(System.out::println);
-        System.out.println("You selected ");
+        System.out.print("You selected: ");
         return Integer.parseInt(scanner.nextLine());
     }
 
@@ -75,15 +74,31 @@ public class GameMenuHandler {
 
     private void listGames() {
         List<GamesData> games = gamesService.getAllGames();
-        games.forEach(game -> System.out.println(game.toString()));
+        games.forEach(game -> System.out.println(game.getGameId() + ": " + game.getGameName()));
     }
 
-    private void patchGame() {
-        System.out.println("Enter game ID to update:");
-        Long gameId = Long.parseLong(scanner.nextLine());
+    private void selectAndUpdateGame() {
+        List<GamesData> games = gamesService.getAllGames();
+        List<String> gameNames = games.stream()
+                .map(game -> game.getGameId() + ": " + game.getGameName())
+                .collect(Collectors.toList());
 
-        // Fetch the existing game
-        GamesData existingGame = gamesService.getGameById(gameId);
+        System.out.println("Select a game to update:");
+        for (int i = 0; i < gameNames.size(); i++) {
+            System.out.println((i + 1) + ") " + gameNames.get(i));
+        }
+
+        int selection = Integer.parseInt(scanner.nextLine()) - 1;
+        if (selection >= 0 && selection < games.size()) {
+            GamesData selectedGame = games.get(selection);
+            updateGame(selectedGame);
+        } else {
+            System.out.println("Invalid selection");
+        }
+    }
+
+    private void updateGame(GamesData existingGame) {
+        System.out.println("Updating game: " + existingGame.getGameName());
 
         System.out.println("Enter new game name (leave blank to keep current):");
         String gameName = scanner.nextLine();
@@ -109,19 +124,8 @@ public class GameMenuHandler {
             existingGame.setMaxPlayers(Integer.parseInt(maxPlayersInput));
         }
 
-        // You may want to handle gameUsers and stores similarly, allowing updates only if provided.
-        // e.g., if(gameUsersInputIsNotEmpty) { existingGame.setGameUsers(...) }
-
-        GamesData updatedGame = gamesService.patchGame(existingGame);
+        GamesData updatedGame = gamesService.patchGame(existingGame.getGameId(), existingGame);
         System.out.println("Game updated: " + updatedGame);
-    }
-
-    private void selectGame() {
-        System.out.println("Enter game ID:");
-        Long gameId = Long.parseLong(scanner.nextLine());
-
-        GamesData game = gamesService.getGameById(gameId);
-        System.out.println("Selected game: " + game);
     }
 
     private void deleteGame() {

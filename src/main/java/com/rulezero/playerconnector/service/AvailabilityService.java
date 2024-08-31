@@ -38,6 +38,19 @@ public class AvailabilityService {
         return mapToData(savedAvailability);
     }
 
+    public AvailabilityData getAvailabilityById(Long availabilityId) {
+        Availability availability = availabilityDao.findById(availabilityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + availabilityId));
+        return mapToData(availability);
+    }
+
+    public List<AvailabilityData> getAllAvailabilities() {
+        List<Availability> availabilities = availabilityDao.findAll();
+        return availabilities.stream()
+                .map(this::mapToData)
+                .collect(Collectors.toList());
+    }
+
     public List<AvailabilityData> getAvailabilityByUserId(Long userId) {
         List<Availability> availabilities = availabilityDao.findByUser_UserId(userId);
         return availabilities.stream().map(this::mapToData).collect(Collectors.toList());
@@ -79,11 +92,16 @@ public class AvailabilityService {
         availabilityDao.deleteAll(availabilities);
     }
 
-    public void deleteAvailabilityByAvailabilityId(Long availabilityId) {
+    @Transactional
+    public void deleteAvailabilityById(Long availabilityId) {
         Availability availability = availabilityDao.findById(availabilityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + availabilityId));
         availabilityDao.delete(availability);
     }
+
+    public void deleteAvailability(Long availabilityId) {
+    }
+
     // unsure if I'll ever need this one
 //    public List<AvailabilityData> getAvailabilityByDateRange(LocalDate startDate, LocalDate endDate) {
 //        List<Availability> availabilities = availabilityDao.findByDateRange(startDate, endDate);
