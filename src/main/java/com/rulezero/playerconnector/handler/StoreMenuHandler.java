@@ -33,9 +33,13 @@ public class StoreMenuHandler {
         while (!back) {
             int selection = getUserSelection(storeMenu);
             switch (selection) {
+                // TODO: Verify addStore
                 case 1 -> addStore();
+                // TODO: Verify listStores
                 case 2 -> listStores();
+                // TODO: Verify selectAndUpdateStore - maybe bad timing. Maybe weird error?
                 case 3 -> selectAndUpdateStore();
+                // TODO: Verify deleteStore
                 case 4 -> deleteStore();
                 case 0 -> back = true;
                 default -> System.out.println("Invalid selection");
@@ -97,7 +101,14 @@ public class StoreMenuHandler {
 
     private void listStores() {
         List<StoresData> stores = storesService.getAllStores();
-        stores.forEach(store -> System.out.println(store.getStoreId() + ": " + store.getStoreName()));
+        if (stores.isEmpty()) {
+            System.out.println("No stores found.");
+        } else {
+            System.out.println("Stores:");
+            for (StoresData store : stores) {
+                System.out.println(store.getStoreId() + ": " + store.getStoreName() + " - " + store.getStoreCity());
+            }
+        }
     }
 
     private void selectAndUpdateStore() {
@@ -158,7 +169,7 @@ public class StoreMenuHandler {
         if (!storeRegion.isEmpty()) {
             existingStore.setStoreRegion(storeRegion);
         }
-        // unsure about how to update booleans this way
+
         System.out.println("Update store disability access? (true/false, leave blank to keep current):");
         String disabilityInput = scanner.nextLine();
         if (!disabilityInput.isEmpty()) {

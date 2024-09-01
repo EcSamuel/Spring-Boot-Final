@@ -30,9 +30,13 @@ public class GameMenuHandler {
         while (!back) {
             int selection = getUserSelection(gameMenu);
             switch (selection) {
+                // TODO: Verify addGame
                 case 1 -> addGame();
+                // TODO: Verify listGames
                 case 2 -> listGames();
+                // TODO: Verify selectAndUpdateGame- Presently throwing a LAZY initialization exception, possibly connected to the players field, so a relational issue
                 case 3 -> selectAndUpdateGame();
+                // TODO: Verify deleteGame
                 case 4 -> deleteGame();
                 case 0 -> back = true;
                 default -> System.out.println("Invalid selection");

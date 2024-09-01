@@ -32,9 +32,13 @@ public class UserMenuHandler {
         while (!back) {
             int selection = getUserSelection(userMenu);
             switch (selection) {
+                // TODO: Verify addUser
                 case 1 -> addUser();
+                // TODO: Verify listUsers
                 case 2 -> listUsers();
+                // TODO: Verify selectAndUpdateUser- currently StackOverflow when trying to update table relationships
                 case 3 -> selectAndUpdateUser();
+                // TODO: Verify deleteUser
                 case 4 -> deleteUser();
                 case 0 -> back = true;
                 default -> System.out.println("Invalid selection");
@@ -77,8 +81,8 @@ public class UserMenuHandler {
         System.out.println("Enter email:");
         String userEmail = scanner.nextLine();
 
-        System.out.println("Enter availability ID:");
-        Long availabilityId = Long.parseLong(scanner.nextLine());
+//        System.out.println("Enter availability ID:");
+//        Long availabilityId = Long.parseLong(scanner.nextLine());
 
         UsersData newUser = new UsersData();
         newUser.setFirstName(firstName);
@@ -90,7 +94,8 @@ public class UserMenuHandler {
         newUser.setUserLoginName(userLoginName);
         newUser.setPassword(password);
         newUser.setUserEmail(userEmail);
-        newUser.setAvailabilityId(availabilityId);
+        // TODO: Find out if this HooDoo Works
+        newUser.setAvailabilityId(null);
         newUser.setGameIds(null);
         newUser.setStoreIds(null);
 
@@ -193,7 +198,7 @@ public class UserMenuHandler {
             }
             existingUser.setStoreIds(currentStoreIds);
         }
-
+        // This is where it starts to go wrong
         System.out.println("Update the user's games? (leave blank to keep current):");
         String gameIdsInput = scanner.nextLine();
         if (!gameIdsInput.isEmpty()) {

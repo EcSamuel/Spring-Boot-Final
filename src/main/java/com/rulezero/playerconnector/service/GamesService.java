@@ -37,7 +37,7 @@ public class GamesService {
         Games updatedGame = gamesDao.save(existingGame);
         return convertToGamesData(updatedGame);
     }
-
+    // Tried to add transactional here and it didn't like that
     private void updateGameFields(Games game, GamesData gamesData) {
         if (gamesData.getGameName() != null) {
             game.setName(gamesData.getGameName());

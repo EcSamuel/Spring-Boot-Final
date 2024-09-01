@@ -50,6 +50,7 @@ public class UserService {
         user.setUserRegion(usersData.getUserRegion());
         user.setUserLoginName(usersData.getUserLoginName());
         user.setUserEmail(usersData.getUserEmail());
+        user.setPassword(usersData.getPassword());
 
         if (usersData.getAvailabilityId() != null) {
             Availability availability = availabilityDao.findById(usersData.getAvailabilityId())
@@ -187,7 +188,7 @@ public class UserService {
                 .map(this::convertToUsersData)
                 .collect(Collectors.toList());
     }
-
+    @Transactional
     public List<UsersData> getAllUsers() {
         List<Users> users = usersDao.findAll();
         return users.stream()

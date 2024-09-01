@@ -35,9 +35,13 @@ public class AvailabilityMenuHandler {
         while (!back) {
             int selection = getUserSelection(availabilityMenu);
             switch (selection) {
+                // TODO: Verify addAvailability
                 case 1 -> addAvailability();
+                // TODO: Verify listAvailabilities
                 case 2 -> listAvailabilities();
+                // TODO: Verify selectAndUpdateAvailability
                 case 3 -> selectAndUpdateAvailability();
+                // TODO: Verify deleteAvailability
                 case 4 -> deleteAvailability();
                 case 0 -> back = true;
                 default -> System.out.println("Invalid selection");
@@ -85,7 +89,7 @@ public class AvailabilityMenuHandler {
             System.out.println("Error adding availability: " + e.getMessage());
         }
     }
-// TODO: saveAvailability might be expecting two things passed in, one having to do with Users of some form.
+// TODO: saveAvailability might be expecting two things passed in, one having to do with Users of some form. This might be resolved, or the problem is facing elsewhere
     private void listAvailabilities() {
         List<AvailabilityData> availabilities = availabilityService.getAllAvailabilities();
         availabilities.forEach(availability -> System.out.println(availability.getAvailabilityId() + ": " + availability.getDayOfWeek() + " " + availability.getStartTime() + " - " + availability.getEndTime()));
