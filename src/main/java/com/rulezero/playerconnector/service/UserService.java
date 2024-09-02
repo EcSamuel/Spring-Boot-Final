@@ -1,5 +1,6 @@
 package com.rulezero.playerconnector.service;
 
+import com.rulezero.playerconnector.controller.model.AvailabilityData;
 import com.rulezero.playerconnector.controller.model.UsersData;
 import com.rulezero.playerconnector.dao.GamesDao;
 import com.rulezero.playerconnector.dao.StoresDao;
@@ -33,6 +34,9 @@ public class UserService {
     @Autowired
     private StoresDao storesDao;
 
+    @Autowired
+    private AvailabilityService availabilityService;
+
     @Transactional
     public UsersData saveUser(UsersData usersData) {
         Users user = convertToEntity(usersData);
@@ -53,8 +57,11 @@ public class UserService {
         user.setPassword(usersData.getPassword());
 
         if (usersData.getAvailabilityId() != null) {
-            Availability availability = availabilityDao.findById(usersData.getAvailabilityId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + usersData.getAvailabilityId()));
+            Availability availability = new Availability();
+            availability.setAvailabilityId(usersData.getAvailabilityId());
+            availability.setStartTime(usersData.getStartTime());
+            availability.setEndTime(usersData.getEndTime());
+            availability.setDayOfWeek(usersData.getDayOfWeek());
             user.setUserAvailability(availability);
         }
 
@@ -105,9 +112,21 @@ public class UserService {
         if (usersData.getUserEmail() != null) {
             user.setUserEmail(usersData.getUserEmail());
         }
-        if (usersData.getAvailabilityId() != null) {
-            Availability availability = availabilityDao.findById(usersData.getAvailabilityId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + usersData.getAvailabilityId()));
+        if (usersData.getStartTime() != null || usersData.getEndTime() != null || usersData.getDayOfWeek() != null) {
+            Availability availability = user.getUserAvailability();
+            if (availability == null) {
+                availability = new Availability();
+                availability.setUser(user);
+            }
+            if (usersData.getStartTime() != null) {
+                availability.setStartTime(usersData.getStartTime());
+            }
+            if (usersData.getEndTime() != null) {
+                availability.setEndTime(usersData.getEndTime());
+            }
+            if (usersData.getDayOfWeek() != null) {
+                availability.setDayOfWeek(usersData.getDayOfWeek());
+            }
             user.setUserAvailability(availability);
         }
         if (usersData.getGameIds() != null) {
@@ -207,8 +226,13 @@ public class UserService {
         usersData.setUserRegion(user.getUserRegion());
         usersData.setUserLoginName(user.getUserLoginName());
         usersData.setUserEmail(user.getUserEmail());
-        usersData.setAvailabilityId(user.getUserAvailability() != null ? user.getUserAvailability().getAvailabilityId() : null);
-        usersData.setGameIds(user.getUserGames().stream().map(Games::getGameId).collect(Collectors.toSet()));
+        Availability availability = user.getUserAvailability();
+        if (availability != null) {
+            usersData.setAvailabilityId(availability.getAvailabilityId());
+            usersData.setStartTime(availability.getStartTime());
+            usersData.setEndTime(availability.getEndTime());
+            usersData.setDayOfWeek(availability.getDayOfWeek());
+        }
         return usersData;
     }
 
@@ -227,11 +251,21 @@ public class UserService {
         Users user = usersDao.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        Availability availability = availabilityDao.findById(availabilityId)
-                .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + availabilityId));
+        AvailabilityData availabilityData = availabilityService.getAvailabilityById(availabilityId);
+
+        Availability availability = user.getUserAvailability();
+        if (availability == null) {
+            availability = new Availability();
+            availability.setUser(user);
+        }
+
+        availability.setStartTime(availabilityData.getStartTime());
+        availability.setEndTime(availabilityData.getEndTime());
+        availability.setDayOfWeek(availabilityData.getDayOfWeek());
 
         user.setUserAvailability(availability);
         Users updatedUser = usersDao.save(user);
+
         return convertToUsersData(updatedUser);
     }
 }

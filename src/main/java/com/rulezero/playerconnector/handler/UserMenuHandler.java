@@ -1,5 +1,6 @@
 package com.rulezero.playerconnector.handler;
 
+import com.rulezero.playerconnector.controller.model.AvailabilityData;
 import com.rulezero.playerconnector.controller.model.UsersData;
 import com.rulezero.playerconnector.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,8 +119,10 @@ public class UserMenuHandler {
         for (int i = 0; i < userNames.size(); i++) {
             System.out.println((i + 1) + ") " + userNames.get(i));
         }
-
+        // TODO: When updating a number is returning potentially wrong values
         int selection = Integer.parseInt(scanner.nextLine()) - 1;
+        // Heres where I need to log information from what is being passed in
+        System.out.println("You selected");
         if (selection >= 0 && selection < users.size()) {
             UsersData selectedUser = users.get(selection);
             updateUser(selectedUser);
@@ -179,10 +182,18 @@ public class UserMenuHandler {
             existingUser.setPassword(password);
         }
 
-        System.out.println("Enter new email for user (leave blank to keep current):");
-        String userEmail = scanner.nextLine();
-        if (!userEmail.isEmpty()) {
-            existingUser.setUserEmail(userEmail);
+        System.out.println("Update the user's availability?");
+        String updateAvailability = scanner.nextLine();
+        if ("yes".equalsIgnoreCase(updateAvailability)) {
+            AvailabilityData availabilityData = new AvailabilityData();
+            availabilityData.setAvailabilityId(existingUser.getAvailabilityId());
+            availabilityData.setStartTime(existingUser.getStartTime());
+            availabilityData.setEndTime(existingUser.getEndTime());
+            availabilityData.setDayOfWeek(existingUser.getDayOfWeek());
+            availabilityData.setUserId(existingUser.getUserId());
+
+            UsersData updatedUser = usersService.updateUserAvailability(existingUser.getUserId(), availabilityData.getAvailabilityId());
+            existingUser.setAvailabilityId(updatedUser.getAvailabilityId());
         }
 
         System.out.println("Update the user's stores? (leave blank to keep current):");

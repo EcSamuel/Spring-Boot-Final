@@ -25,6 +25,8 @@ public class AvailabilityService {
 
     @Transactional
     public Availability saveAvailability(Availability availability, Users users) {
+        System.out.println("Availabilty entity before saving:" + availability);
+        System.out.println("User entity associated" + users);
         if (users == null || availability == null) {
             throw new IllegalArgumentException("User and Availability must not be null");
         }
@@ -42,6 +44,8 @@ public class AvailabilityService {
         }
         // If the availability ID is null or it doesn't exist in the database
         availability.setUser(users);
+        // This sout might be written incorrectly.
+        System.out.println("Saved Availability entity:" + availability);
         return availabilityDao.save(availability);
     }
 
@@ -82,9 +86,9 @@ public class AvailabilityService {
     }
 
     @Transactional
-    public AvailabilityData updateAvailability(Long availabilityId, AvailabilityData availabilityData) throws ResourceNotFoundException {
-        Availability existingAvailability = availabilityDao.findById(availabilityId)
-                .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + availabilityId));
+    public AvailabilityData updateAvailability(AvailabilityData availabilityData) {
+        Availability existingAvailability = availabilityDao.findById(availabilityData.getAvailabilityId())
+                .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + availabilityData.getAvailabilityId()));
 
         existingAvailability.setDayOfWeek(availabilityData.getDayOfWeek());
         existingAvailability.setStartTime(availabilityData.getStartTime());

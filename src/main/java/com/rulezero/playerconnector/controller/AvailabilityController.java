@@ -60,7 +60,8 @@ public class AvailabilityController {
     public ResponseEntity<AvailabilityData> updateAvailability(
             @PathVariable Long availabilityId,
             @RequestBody AvailabilityData availabilityData) {
-        AvailabilityData updatedAvailability = availabilityService.updateAvailability(availabilityId, availabilityData);
+        availabilityData.setAvailabilityId(availabilityId); // Ensure the ID is set
+        AvailabilityData updatedAvailability = availabilityService.updateAvailability(availabilityData);
         return ResponseEntity.ok(updatedAvailability);
     }
 

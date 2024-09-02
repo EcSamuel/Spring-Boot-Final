@@ -20,5 +20,8 @@ public class UsersData {
     private Long availabilityId; // Foreign key reference to Availability
     private Set<Long> gameIds;  // List of game IDs associated with the user
     private Set<Long> storeIds;
-
+    // unsure about these long term but seeing if they solve the problem
+    private String startTime;
+    private String endTime;
+    private String dayOfWeek;
 }

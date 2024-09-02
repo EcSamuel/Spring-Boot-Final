@@ -136,7 +136,7 @@ public class AvailabilityMenuHandler {
             existingAvailability.setEndTime(endTime);
         }
 
-        AvailabilityData updatedAvailability = availabilityService.updateAvailability(existingAvailability.getAvailabilityId(), existingAvailability);
+        AvailabilityData updatedAvailability = availabilityService.updateAvailability(existingAvailability);
         System.out.println("Availability updated: " + updatedAvailability);
     }
 
