@@ -22,7 +22,7 @@ public class Availability {
     @Column(nullable = false, length = 64)
     private String endTime;
 
-    @ManyToOne(optional = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users user;
 

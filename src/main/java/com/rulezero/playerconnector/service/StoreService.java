@@ -136,7 +136,6 @@ public class StoreService {
                 .map(this::convertToStoresData)
                 .collect(Collectors.toList());
     }
-    // TODO: Data produces to the CLI incorrectly from menu.
     @Transactional
     public List<StoresData> getAllStores() {
         List<Stores> stores = storesDao.findAll();

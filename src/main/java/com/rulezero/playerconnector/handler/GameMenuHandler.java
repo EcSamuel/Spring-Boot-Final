@@ -1,12 +1,16 @@
 package com.rulezero.playerconnector.handler;
 
 import com.rulezero.playerconnector.controller.model.GamesData;
+import com.rulezero.playerconnector.entity.Users;
 import com.rulezero.playerconnector.service.GamesService;
+import com.rulezero.playerconnector.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -14,6 +18,9 @@ public class GameMenuHandler {
 
     @Autowired
     private GamesService gamesService;
+
+    @Autowired
+    private UserService userService;
 
     private Scanner scanner = new Scanner(System.in);
 
@@ -126,6 +133,21 @@ public class GameMenuHandler {
         String maxPlayersInput = scanner.nextLine();
         if (!maxPlayersInput.isEmpty()) {
             existingGame.setMaxPlayers(Integer.parseInt(maxPlayersInput));
+        }
+        // TODO: This is new and needs to be verified both structure and logic-wise. If it works, apply similar methods to other handler calls.
+        System.out.println("Update players for the game? (enter player IDs separated by commas, leave blank to keep current):");
+        String playerIdsInput = scanner.nextLine();
+        if (!playerIdsInput.isEmpty()) {
+            Set<Users> currentPlayers = existingGame.getGameUsers();
+            if (currentPlayers == null) {
+                currentPlayers = new HashSet<>();
+            }
+            String[] newPlayerIds = playerIdsInput.split(",");
+            for (String playerId : newPlayerIds) {
+                Users player = userService.getUserEntityById(Long.parseLong(playerId.trim()));
+                currentPlayers.add(player);
+            }
+            existingGame.setGameUsers(currentPlayers);
         }
 
         GamesData updatedGame = gamesService.patchGame(existingGame.getGameId(), existingGame);

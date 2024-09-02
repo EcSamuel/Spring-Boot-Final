@@ -46,10 +46,25 @@ public class Users {
     @Column(nullable = false, unique = true)
     private String userEmail;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "availability_id")
-    private Availability userAvailability;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Availability> availabilities = new HashSet<>();
 
+    public Availability getUserAvailability() {
+        return availabilities.stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void setUserAvailability(Availability availability) {
+        if (availability != null) {
+            availability.setUser(this);
+            this.availabilities.add(availability);
+        } else {
+            this.availabilities.removeIf(a -> a.getUser().equals(this));
+        }
+    }
+
+    // TODO: These relationships need verification so that their relationships work
     @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY)
     private Set<Games> userGames = new HashSet<>();
 
