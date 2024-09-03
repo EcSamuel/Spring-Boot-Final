@@ -12,7 +12,7 @@ import java.util.Scanner;
 // TODO: Remove all Store-Level and Store-Facing Files on an attempt to Scale down and resolve circular dependencies
 @SpringBootApplication
 public class PlayerconnectorApplication {
-
+    // TODO: Dr Rob shows this as "implements CommandLineRunner- look into this
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(PlayerconnectorApplication.class, args);
 

@@ -1,14 +1,13 @@
 package com.rulezero.playerconnector.handler;
 
+import com.rulezero.playerconnector.controller.model.GamesData;
 import com.rulezero.playerconnector.controller.model.UsersData;
 import com.rulezero.playerconnector.service.UserService;
+import com.rulezero.playerconnector.service.GameUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -16,6 +15,9 @@ public class UserMenuHandler {
 
     @Autowired
     private UserService usersService;
+
+    @Autowired
+    private GameUserService gameUserService;
 
     private Scanner scanner = new Scanner(System.in);
 
@@ -96,7 +98,6 @@ public class UserMenuHandler {
         newUser.setUserEmail(userEmail);
         // TODO: Find out if this HooDoo Works
         newUser.setAvailabilityId(null);
-        newUser.setGameIds(null);
 
         UsersData savedUser = usersService.saveUser(newUser);
         System.out.println("User added: " + savedUser);
@@ -185,18 +186,13 @@ public class UserMenuHandler {
         }
 
         // This is where it starts to go wrong
-        System.out.println("Update the user's games? (leave blank to keep current):");
+        System.out.println("Update the user's games? (enter game IDs separated by commas, leave blank to keep current):");
         String gameIdsInput = scanner.nextLine();
         if (!gameIdsInput.isEmpty()) {
-            Set<Long> currentGameIds = existingUser.getGameIds();
-            if (currentGameIds == null) {
-                currentGameIds = new HashSet<>();
-            }
-            String[] newGameIds = gameIdsInput.trim().split(",");
-            for (String gameId : newGameIds) {
-                currentGameIds.add(Long.parseLong(gameId));
-            }
-            existingUser.setGameIds(currentGameIds);
+            List<Long> gameIds = Arrays.stream(gameIdsInput.split(","))
+                    .map(id -> Long.parseLong(id.trim()))
+                    .collect(Collectors.toList());
+            gameUserService.updateUserGames(existingUser.getUserId(), gameIds);
         }
 
         UsersData updatedUser = usersService.patchUser(existingUser.getUserId(), existingUser);

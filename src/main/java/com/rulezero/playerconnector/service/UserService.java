@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+    private final UsersDao usersDao;
 
     @Autowired
-    private UsersDao usersDao;
+    public UserService(UsersDao usersDao, GamesDao gamesDao) {
+        this.usersDao = usersDao;
+    }
 
     @Autowired
     private AvailabilityDao availabilityDao;
-
-    @Autowired
-    private GamesDao gamesDao;
 
     @Transactional
     public UsersData saveUser(UsersData usersData) {
@@ -53,13 +53,13 @@ public class UserService {
             user.setUserAvailability(availability);
         }
 
-        if (usersData.getGameIds() != null) {
-            Set<Games> games = usersData.getGameIds().stream()
-                    .map(gameId -> gamesDao.findById(gameId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Game not found with id: " + gameId)))
-                    .collect(Collectors.toSet());
-            user.setUserGames(games);
-        }
+//        if (usersData.getGameIds() != null) {
+//            Set<Games> games = usersData.getGameIds().stream()
+//                    .map(gameId -> gamesDao.findById(gameId)
+//                            .orElseThrow(() -> new ResourceNotFoundException("Game not found with id: " + gameId)))
+//                    .collect(Collectors.toSet());
+//            user.setUserGames(games);
+//        }
 
         return user;
     }
@@ -105,33 +105,14 @@ public class UserService {
                     .orElseThrow(() -> new ResourceNotFoundException("Availability not found with id: " + usersData.getAvailabilityId()));
             user.setUserAvailability(availability);
         }
-        if (usersData.getGameIds() != null) {
-            updateUserGames(user, usersData.getGameIds());
-        }
+//        if (usersData.getGameIds() != null) {
+//            updateUserGames(user, usersData.getGameIds());
+//        }
     }
 
     public Users getUserEntityById(Long userId) {
         return usersDao.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-    }
-
-    @Transactional
-    public void updateUserGames(Users user, Set<Long> gameIds) {
-        Set<Games> newGames = gameIds.stream()
-                .map(gameId -> gamesDao.findById(gameId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Game not found with id: " + gameId)))
-                .collect(Collectors.toSet());
-
-        // Remove games not in the new set
-        user.getUserGames().removeIf(game -> !newGames.contains(game));
-
-        // Add new games
-        newGames.forEach(game -> {
-            if (!user.getUserGames().contains(game)) {
-                user.getUserGames().add(game);
-                game.getPlayers().add(user);
-            }
-        });
     }
 
     @Transactional
@@ -178,7 +159,7 @@ public class UserService {
         usersData.setUserLoginName(user.getUserLoginName());
         usersData.setUserEmail(user.getUserEmail());
         usersData.setAvailabilityId(user.getUserAvailability() != null ? user.getUserAvailability().getAvailabilityId() : null);
-        usersData.setGameIds(user.getUserGames().stream().map(Games::getGameId).collect(Collectors.toSet()));
+//        usersData.setGameIds(user.getUserGames().stream().map(Games::getGameId).collect(Collectors.toSet()));
         return usersData;
     }
 

@@ -1,5 +1,6 @@
 package com.rulezero.playerconnector.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,8 +12,8 @@ import java.util.Set;
 
 @Entity
 @Data
-@ToString(exclude={"players","stores"})
-@EqualsAndHashCode(exclude={"players","stores"})
+//@ToString(exclude={"players","stores"})
+//@EqualsAndHashCode(exclude={"players","stores"})
 public class Users {
     @Id
     @Getter
@@ -65,7 +66,12 @@ public class Users {
     }
 
     // TODO: These relationships need verification so that their relationships work
-    @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY)
+    @ManyToMany
+    @JoinTable(
+            name = "user_games",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "game_id")
+    )
     private Set<Games> userGames = new HashSet<>();
 
 }

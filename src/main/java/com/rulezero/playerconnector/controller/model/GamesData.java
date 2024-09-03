@@ -10,7 +10,7 @@ public class GamesData {
     private Long gameId;
     private String gameName;
     private String gameDescription;
-    private Set<Users> gameUsers;
+//    private Set<Users> gameUsers;
     private Integer minPlayers;
     private Integer maxPlayers;
 }

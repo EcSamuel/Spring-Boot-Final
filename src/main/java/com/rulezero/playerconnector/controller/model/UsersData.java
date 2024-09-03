@@ -18,7 +18,7 @@ public class UsersData {
     private String password;
     private String userEmail;
     private Long availabilityId; // Foreign key reference to Availability
-    private Set<Long> gameIds;  // List of game IDs associated with the user
-    private Set<Long> storeIds;
+//    private Set<Long> gameIds;  // List of game IDs associated with the user
+
 
 }

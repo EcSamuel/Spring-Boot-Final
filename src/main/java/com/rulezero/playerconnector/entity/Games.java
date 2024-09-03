@@ -1,5 +1,6 @@
 package com.rulezero.playerconnector.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,12 +23,7 @@ public class Games {
 
     private String description;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_games",
-            joinColumns = @JoinColumn(name = "game_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+    @ManyToMany(mappedBy = "userGames")
     private Set<Users> players = new HashSet<>();
 
     // Helper methods for managing players

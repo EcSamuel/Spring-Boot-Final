@@ -4,13 +4,11 @@ import com.rulezero.playerconnector.controller.model.GamesData;
 import com.rulezero.playerconnector.entity.Users;
 import com.rulezero.playerconnector.service.GamesService;
 import com.rulezero.playerconnector.service.UserService;
+import com.rulezero.playerconnector.service.GameUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,7 +18,7 @@ public class GameMenuHandler {
     private GamesService gamesService;
 
     @Autowired
-    private UserService userService;
+    private GameUserService gameUserService;
 
     private Scanner scanner = new Scanner(System.in);
 
@@ -76,7 +74,7 @@ public class GameMenuHandler {
         newGame.setGameDescription(gameDescription);
         newGame.setMinPlayers(minPlayers);
         newGame.setMaxPlayers(maxPlayers);
-        newGame.setGameUsers(null);
+//        newGame.setGameUsers(null);
 
         GamesData savedGame =gamesService.saveGame(newGame);
         System.out.println("Game attempting add" +savedGame);
@@ -137,16 +135,10 @@ public class GameMenuHandler {
         System.out.println("Update players for the game? (enter player IDs separated by commas, leave blank to keep current):");
         String playerIdsInput = scanner.nextLine();
         if (!playerIdsInput.isEmpty()) {
-            Set<Users> currentPlayers = existingGame.getGameUsers();
-            if (currentPlayers == null) {
-                currentPlayers = new HashSet<>();
-            }
-            String[] newPlayerIds = playerIdsInput.split(",");
-            for (String playerId : newPlayerIds) {
-                Users player = userService.getUserEntityById(Long.parseLong(playerId.trim()));
-                currentPlayers.add(player);
-            }
-            existingGame.setGameUsers(currentPlayers);
+            List<Long> playerIds = Arrays.stream(playerIdsInput.split(","))
+                    .map(id -> Long.parseLong(id.trim()))
+                    .collect(Collectors.toList());
+            gameUserService.updateGamePlayers(existingGame.getGameId(), playerIds);
         }
 
         GamesData updatedGame = gamesService.patchGame(existingGame.getGameId(), existingGame);
