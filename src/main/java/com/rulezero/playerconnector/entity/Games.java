@@ -30,14 +30,6 @@ public class Games {
     )
     private Set<Users> players = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "store_games",
-            joinColumns = @JoinColumn(name = "game_id"),
-            inverseJoinColumns = @JoinColumn(name = "store_id")
-    )
-    private Set<Stores> stores = new HashSet<>();
-
     // Helper methods for managing players
     public void addPlayer(Users user) {
         this.players.add(user);
@@ -47,9 +39,6 @@ public class Games {
     public void removePlayer(Users user) {
         this.players.remove(user);
         user.getUserGames().remove(this);
-    }
-
-    public void addStore(Stores stores) {
     }
 }
 

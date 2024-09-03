@@ -68,12 +68,4 @@ public class Users {
     @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY)
     private Set<Games> userGames = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "store_users",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "store_id")
-    )
-    private Set<Stores> userStores = new HashSet<>();
-
 }

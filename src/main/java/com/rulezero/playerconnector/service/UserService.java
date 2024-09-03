@@ -2,11 +2,9 @@ package com.rulezero.playerconnector.service;
 
 import com.rulezero.playerconnector.controller.model.UsersData;
 import com.rulezero.playerconnector.dao.GamesDao;
-import com.rulezero.playerconnector.dao.StoresDao;
 import com.rulezero.playerconnector.dao.UsersDao;
 import com.rulezero.playerconnector.entity.Availability;
 import com.rulezero.playerconnector.entity.Games;
-import com.rulezero.playerconnector.entity.Stores;
 import com.rulezero.playerconnector.entity.Users;
 import com.rulezero.playerconnector.dao.AvailabilityDao;
 import com.rulezero.playerconnector.exception.ResourceNotFoundException;
@@ -29,9 +27,6 @@ public class UserService {
 
     @Autowired
     private GamesDao gamesDao;
-
-    @Autowired
-    private StoresDao storesDao;
 
     @Transactional
     public UsersData saveUser(UsersData usersData) {
@@ -115,30 +110,6 @@ public class UserService {
         }
     }
 
-    @Transactional
-    public void updateUserStores(Long userId, Set<Long> storeIds) throws ResourceNotFoundException {
-        Users user = usersDao.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        Set<Stores> newStores = storeIds.stream()
-                .map(storeId -> storesDao.findById(storeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + storeId)))
-                .collect(Collectors.toSet());
-
-        // Remove stores not in the new set
-        user.getUserStores().removeIf(store -> !newStores.contains(store));
-
-        // Add new stores
-        newStores.forEach(store -> {
-            if (!user.getUserStores().contains(store)) {
-                user.getUserStores().add(store);
-                store.getStoreUsers().add(user);
-            }
-        });
-
-        usersDao.save(user);
-    }
-
     public Users getUserEntityById(Long userId) {
         return usersDao.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -170,7 +141,6 @@ public class UserService {
 
         // Remove the user from all games and stores
         user.getUserGames().forEach(game -> game.getPlayers().remove(user));
-        user.getUserStores().forEach(store -> store.getStoreUsers().remove(user));
 
         usersDao.delete(user);
     }
@@ -217,7 +187,6 @@ public class UserService {
         List<Users> users = usersDao.findAllById(userIds);
         users.forEach(user -> {
             user.getUserGames().forEach(game -> game.getPlayers().remove(user));
-            user.getUserStores().forEach(store -> store.getStoreUsers().remove(user));
             usersDao.delete(user);
         });
     }
