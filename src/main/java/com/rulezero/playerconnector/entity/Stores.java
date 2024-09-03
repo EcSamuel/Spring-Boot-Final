@@ -12,6 +12,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+// TODO: ToString and EqualsHashCode might need to go
 @ToString(exclude = {"storeGames", "storeUsers"})
 @EqualsAndHashCode(exclude = {"storeGames", "storeUsers"})
 @Table(name = "stores")

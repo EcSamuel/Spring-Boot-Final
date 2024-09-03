@@ -1,18 +1,18 @@
 package com.rulezero.playerconnector.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Data
-@ToString(exclude={"players","stores"})
-@EqualsAndHashCode(exclude={"players","stores"})
+@Getter
+@Setter
+// TODO: ToString and EqualsHashCode might need to go
+//@ToString(exclude={"players","stores"})
+//@EqualsAndHashCode(exclude={"players","stores"})
 public class Users {
     @Id
     @Getter
@@ -65,7 +65,7 @@ public class Users {
     }
 
     // TODO: These relationships need verification so that their relationships work
-    @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "players", fetch = FetchType.EAGER)
     private Set<Games> userGames = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

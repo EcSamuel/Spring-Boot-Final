@@ -76,16 +76,16 @@ public class UserService {
         return user;
     }
 
-    @Transactional
-    public UsersData patchUser(Long userId, UsersData usersData) throws ResourceNotFoundException {
-        Users existingUser = usersDao.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        updateUserFields(existingUser, usersData);
-
-        Users updatedUser = usersDao.save(existingUser);
-        return convertToUsersData(updatedUser);
-    }
+//    @Transactional
+//    public UsersData patchUser(Long userId, UsersData usersData) throws ResourceNotFoundException {
+//        Users existingUser = usersDao.findById(userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+//
+//        updateUserFields(existingUser, usersData);
+//
+//        Users updatedUser = usersDao.save(existingUser);
+//        return convertToUsersData(updatedUser);
+//    }
 
     private void updateUserFields(Users user, UsersData usersData) {
         if (usersData.getFirstName() != null) {
@@ -194,12 +194,12 @@ public class UserService {
         usersDao.delete(user);
     }
 
-    public UsersData getUserById(Long userId) {
-        Users user = usersDao.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        return convertToUsersData(user);
-    }
+//    public UsersData getUserById(Long userId) {
+//        Users user = usersDao.findById(userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+//
+//        return convertToUsersData(user);
+//    }
 
     public List<UsersData> searchUsersByName(String query) {
         List<Users> users = usersDao.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(query, query);
@@ -207,13 +207,13 @@ public class UserService {
                 .map(this::convertToUsersData)
                 .collect(Collectors.toList());
     }
-    @Transactional
-    public List<UsersData> getAllUsers() {
-        List<Users> users = usersDao.findAll();
-        return users.stream()
-                .map(this::convertToUsersData)
-                .collect(Collectors.toList());
-    }
+//    @Transactional
+//    public List<UsersData> getAllUsers() {
+//        List<Users> users = usersDao.findAll();
+//        return users.stream()
+//                .map(this::convertToUsersData)
+//                .collect(Collectors.toList());
+//    }
 
     private UsersData convertToUsersData(Users user) {
         UsersData usersData = new UsersData();
@@ -266,6 +266,32 @@ public class UserService {
         user.setUserAvailability(availability);
         Users updatedUser = usersDao.save(user);
 
+        return convertToUsersData(updatedUser);
+    }
+    // originally these next two methods had readyOnly = true in them but I can't get that to exist
+    @Transactional()
+    public UsersData getUserById(Long userId) {
+        Users user = usersDao.findByIdWithAssociations(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        return convertToUsersData(user);
+    }
+
+    @Transactional()
+    public List<UsersData> getAllUsers() {
+        List<Users> users = usersDao.findAllWithAssociations();
+        return users.stream()
+                .map(this::convertToUsersData)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public UsersData patchUser(Long userId, UsersData usersData) throws ResourceNotFoundException {
+        Users existingUser = usersDao.findByIdWithAssociations(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        updateUserFields(existingUser, usersData);
+
+        Users updatedUser = usersDao.save(existingUser);
         return convertToUsersData(updatedUser);
     }
 }

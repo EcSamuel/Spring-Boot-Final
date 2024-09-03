@@ -5,6 +5,8 @@ import lombok.*;
 
 @Entity
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Availability {
@@ -22,7 +24,7 @@ public class Availability {
     @Column(nullable = false, length = 64)
     private String endTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private Users user;
 
